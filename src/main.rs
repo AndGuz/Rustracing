@@ -1,28 +1,35 @@
 mod vec;
-use std::io::{stderr, Write};
+use std::{
+    io::{stderr, Write},
+    rc::Rc,
+};
 use vec::{Color, Vec3};
 mod hit;
 mod ray;
 mod sphere;
 use ray::Ray;
 mod camera;
+mod mat;
 use rand::{self, Rng};
 
 use crate::vec::Point3;
 use camera::Camera;
 use hit::{Hit, World};
+use mat::*;
 use sphere::Sphere;
 
 #[inline]
-fn ray_color(r: &Ray, world: &World,depth: u64) -> Color {
+fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
     if depth <= 0 {
-        return Color::new(0.0,0.0,0.0);
+        return Color::new(0.0, 0.0, 0.0);
     }
 
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
-        let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
-        let r = Ray::new(rec.p, target - rec.p);
-        0.5 * ray_color(&r, world, depth - 1)
+        if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
+            attenuation * ray_color(&scattered, world, depth - 1)
+        } else {
+            Color::new(0.0, 0.0, 0.0)
+        }
     } else {
         let unit_direction = r.direction().unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -35,16 +42,23 @@ fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 256;
     const IMAGE_HEIGHT: u64 = ((256 as f64) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 100;
-    const MAX_DEPTH: u64 = 5;
+    const SAMPLES_PER_PIXEL: u64 = 64;
+    const MAX_DEPTH: u64 = 10;
 
     //el mundito
     let mut world = World::new();
-    world.push(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    let r: f64 = (std::f64::consts::PI / 4.0).cos();
 
+    let mat_left = Rc::new(Lambertian::new(Color::new(0.0, 0.0, 1.0)));
+    let mat_right = Rc::new(Lambertian::new(Color::new(1.0,0.0,0.0)));
+
+    let sphere_left = Sphere::new(Point3::new(-r, 0.0, -1.0), r, mat_left);
+    let sphere_right = Sphere::new(Point3::new(r, 0.0, -1.0), r, mat_right);
+
+    world.push(Box::new(sphere_left));
+    world.push(Box::new(sphere_right));
     //Camara
-    let cam = Camera::new();
+    let cam = Camera::new(90.0,ASPECT_RATIO);
 
     //Salida de ppm
     println!("P3\n{} {}\n 256", IMAGE_WIDTH, IMAGE_HEIGHT);

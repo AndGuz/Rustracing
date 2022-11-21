@@ -1,10 +1,10 @@
-use super::ray::Ray;
-use super::vec::{Point3, Vec3};
+use crate::mat::Scatter;
+use crate::{ray::Ray, vec::*};
 
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat: Rc<dyn>,
+    pub mat: std::rc::Rc<dyn Scatter>,
     pub t: f64,
     pub front_face: bool,
 }

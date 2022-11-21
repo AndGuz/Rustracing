@@ -9,15 +9,15 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Camera {
-        const ASPECT_RATIO: f64 = 16.0 / 9.0;
-        const VIEWPORT_HEIGHT: f64 = 2.0;
-        const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
+    pub fn new(vfov: f64, aspect_ratio: f64) -> Camera {
         const FOCAL_LENGTH: f64 = 1.0;
+        let theta = std::f64::consts::PI / 180.0 * vfov;
+        let viewport_height = 2.0 * (theta/2.0).tan();
+        let viewport_width = aspect_ratio * viewport_height;
 
         let orig = Point3::new(0.0, 0.0, 0.0);
-        let h = Vec3::new(VIEWPORT_WIDTH, 0.0, 0.0);
-        let v = Vec3::new(0.0, VIEWPORT_HEIGHT, 0.0);
+        let h = Vec3::new(viewport_width, 0.0, 0.0);
+        let v = Vec3::new(0.0, viewport_height, 0.0);
         let llc = orig - h / 2.0 - v / 2.0 - Vec3::new(0.0, 0.0, FOCAL_LENGTH);
 
         Camera {
