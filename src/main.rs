@@ -40,8 +40,8 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
 fn main() {
     //Imagen por si aca
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: u64 = 256;
-    const IMAGE_HEIGHT: u64 = ((256 as f64) / ASPECT_RATIO) as u64;
+    const IMAGE_WIDTH: u64 = 512;
+    const IMAGE_HEIGHT: u64 = ((512 as f64) / ASPECT_RATIO) as u64;
     const SAMPLES_PER_PIXEL: u64 = 64;
     const MAX_DEPTH: u64 = 10;
 
