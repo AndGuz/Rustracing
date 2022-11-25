@@ -6,32 +6,58 @@ pub struct Camera {
     lower_left_corner: Point3,
     horizontal: Vec3,
     vertical: Vec3,
+    cu: Vec3,
+    cv: Vec3,
+    lens_radius: f64,
+    time0 : f64,
+    time1 : f64
 }
 
 impl Camera {
-    pub fn new(vfov: f64, aspect_ratio: f64) -> Camera {
-        const FOCAL_LENGTH: f64 = 1.0;
+    pub fn new(
+        lookfrom: Point3,
+        lookat: Point3,
+        vup: Vec3,
+        vfov: f64,
+        aspect_ratio: f64,
+        aperture: f64,
+        focus_dist: f64,
+        time0: f64,
+        time1: f64
+    ) -> Camera {
         let theta = std::f64::consts::PI / 180.0 * vfov;
-        let viewport_height = 2.0 * (theta/2.0).tan();
+        let viewport_height = 2.0 * (theta / 2.0).tan();
         let viewport_width = aspect_ratio * viewport_height;
 
-        let orig = Point3::new(0.0, 0.0, 0.0);
-        let h = Vec3::new(viewport_width, 0.0, 0.0);
-        let v = Vec3::new(0.0, viewport_height, 0.0);
-        let llc = orig - h / 2.0 - v / 2.0 - Vec3::new(0.0, 0.0, FOCAL_LENGTH);
+        let cw = (lookfrom - lookat).unit_vector();
+        let cu = vup.cross(cw).unit_vector();
+        let cv = cw.cross(cu);
+
+        let h = focus_dist * viewport_width * cu;
+        let v = focus_dist * viewport_height * cv;
+
+        let llc = lookfrom - h / 2.0 - v / 2.0 - focus_dist * cw;
 
         Camera {
-            origin: orig,
+            origin: lookfrom,
             horizontal: h,
             vertical: v,
             lower_left_corner: llc,
+            cu: cu,
+            cv: cv,
+            lens_radius: aperture / 2.0,
+            time0,
+            time1
         }
     }
 
-    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
+        let rd = self.lens_radius * Vec3::random_in_unit_disk();
+        let offset = self.cu * rd.x() + self.cv * rd.y();
         Ray::new(
-            self.origin,
-            self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin,
+            self.origin + offset,
+            self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,
+            Vec3::random(self.time0..self.time1).x()
         )
     }
 }

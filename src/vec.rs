@@ -29,7 +29,7 @@ impl Vec3 {
             ],
         }
     }
-    #[inline]
+
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let v = Vec3::random(-1.0..1.0);
@@ -54,13 +54,24 @@ impl Vec3 {
         let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
         r_out_perp + r_out_parallel
     }
-    
+
     pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
         let in_unit_sphere = Self::random_in_unit_sphere();
         if in_unit_sphere.dot(normal) > 0.0 {
             in_unit_sphere
         } else {
             (-1.0) * in_unit_sphere
+        }
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = rand::thread_rng();
+
+        loop {
+            let p = Vec3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0);
+            if p.length() < 1.0 {
+                return p;
+            }
         }
     }
 
@@ -110,7 +121,6 @@ impl Vec3 {
         *self / self.length()
     }
 
-    #[inline]
     pub fn format_color(&self, samples_per_pixel: u64) -> String {
         let ir = (256.0
             * (self[0] / (samples_per_pixel as f64))
