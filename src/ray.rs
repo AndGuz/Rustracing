@@ -3,7 +3,7 @@ use super::vec::{Point3, Vec3};
 pub struct Ray {
     orig: Point3,
     dir: Vec3,
-    tm: f64
+    tm: f64,
 }
 
 impl Ray {
@@ -11,7 +11,7 @@ impl Ray {
         Ray {
             orig: origin,
             dir: direction,
-            tm: time
+            tm: time,
         }
     }
 

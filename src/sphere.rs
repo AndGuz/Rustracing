@@ -57,7 +57,6 @@ impl Hit for Sphere {
     }
 }
 
-
 pub struct MovingSphere {
     center0: Point3,
     center1: Point3,
@@ -68,18 +67,26 @@ pub struct MovingSphere {
 }
 
 impl MovingSphere {
-    pub fn new(cen0: Point3,cen1: Point3, time0:f64,time1:f64,r: f64, m: Arc<dyn Scatter>) -> MovingSphere {
+    pub fn new(
+        cen0: Point3,
+        cen1: Point3,
+        time0: f64,
+        time1: f64,
+        r: f64,
+        m: Arc<dyn Scatter>,
+    ) -> MovingSphere {
         MovingSphere {
-            center0:cen0,
-            center1:cen1,
-            time0 : time0,
+            center0: cen0,
+            center1: cen1,
+            time0: time0,
             time1: time1,
             radius: r,
-            mat: m
+            mat: m,
         }
     }
-    pub fn center(&self, time:f64) -> Point3{
-        self.center0 + ((time - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
+    pub fn center(&self, time: f64) -> Point3 {
+        self.center0
+            + ((time - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
     }
 }
 

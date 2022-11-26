@@ -15,7 +15,7 @@ use crate::vec::Point3;
 use camera::Camera;
 use hit::{Hit, World};
 use mat::*;
-use sphere::{Sphere, MovingSphere};
+use sphere::{MovingSphere, Sphere};
 
 /*
 TODO! dielectricos con tintado
@@ -42,7 +42,7 @@ fn random_scene() -> World {
                 // Diffuse
                 let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
                 let sphere_mat = Arc::new(Lambertian::new(albedo));
-                let center2 = center + Vec3::new(0.0, Vec3::random(0.0..0.5).x(),0.0);
+                let center2 = center + Vec3::new(0.0, Vec3::random(0.0..0.5).x(), 0.0);
                 let sphere = MovingSphere::new(center, center2, 0.0, 1.0, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
@@ -56,7 +56,7 @@ fn random_scene() -> World {
                 world.push(Box::new(sphere));
             } else {
                 // Glass
-                let sphere_mat = Arc::new(Dielectric::new(1.5, choose_mat));
+                let sphere_mat = Arc::new(Dielectric::new(1.5, center.x()));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
@@ -67,14 +67,17 @@ fn random_scene() -> World {
     let mat1 = Arc::new(Dielectric::new(1.5, 0.0));
     let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let mat4 = Arc::new(Dielectric_Tint::new(1.33, 0.1, Color::random(0.0..1.0)));
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
     let sphere2 = Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, mat2);
     let sphere3 = Sphere::new(Point3::new(4.0, 1.0, 0.0), 1.0, mat3);
+    let sphere4 = Sphere::new(Point3::new(8.0, 1.0, 0.0), 1.0, mat4);
 
     world.push(Box::new(sphere1));
     world.push(Box::new(sphere2));
     world.push(Box::new(sphere3));
+    world.push(Box::new(sphere4));
 
     world
 }
@@ -116,12 +119,12 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
 fn main() {
     //Imagen por si aca
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: u64 = 400;
+    const IMAGE_WIDTH: u64 = 500;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 10;
+    const SAMPLES_PER_PIXEL: u64 = 50;
     const MAX_DEPTH: u64 = 5;
 
-    let world = random_scene();
+    let world = front_spheres();
     //Camara
     let lookfrom = Point3::new(13.0, 2.0, 3.0);
     let lookat = Point3::new(0.0, 0.0, 0.0);
@@ -133,12 +136,12 @@ fn main() {
         lookfrom,
         lookat,
         vup,
-        20.0,
+        35.0,
         ASPECT_RATIO,
         aperture,
         dist_to_focus,
         0.0,
-        1.0
+        1.0,
     );
 
     //Salida de ppm
@@ -146,7 +149,7 @@ fn main() {
     let mut rng = rand::thread_rng();
 
     for j in (0..IMAGE_HEIGHT).rev() {
-        //eprintln!("Lineas faltantes {} ", j + 1);
+        //eprintln!("\r{} ", j + 1);
 
         let scanline: Vec<Color> = (0..IMAGE_WIDTH)
             .into_par_iter()

@@ -23,12 +23,12 @@ impl Lambertian {
 
 impl Scatter for Lambertian {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
-        let mut scatter_direction = rec.normal + Vec3::random_in_unit_sphere().unit_vector();
+        let mut scatter_direction = Vec3::random_in_hemisphere(rec.normal).unit_vector();
         if scatter_direction.near_zero() {
             scatter_direction = rec.normal;
         }
 
-        let scattered = Ray::new(rec.p, scatter_direction,r_in.time());
+        let scattered = Ray::new(rec.p, scatter_direction, r_in.time());
 
         Some((self.albedo, scattered))
     }
@@ -49,7 +49,11 @@ impl Metal {
 impl Scatter for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let reflected = r_in.direction().reflect(rec.normal).unit_vector();
-        let scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_in_unit_sphere(),r_in.time());
+        let scattered = Ray::new(
+            rec.p,
+            reflected + self.fuzz * Vec3::random_in_unit_sphere(),
+            r_in.time(),
+        );
 
         if scattered.direction().dot(rec.normal) > 0.0 {
             Some((self.albedo, scattered))
@@ -101,7 +105,11 @@ impl Scatter for Dielectric {
             unit_direction.refract(rec.normal, refraction_ratio)
         };
 
-        let scattered = Ray::new(rec.p, direction + self.fuzz * Vec3::random_in_unit_sphere(),r_in.time());
+        let scattered = Ray::new(
+            rec.p,
+            direction + self.fuzz * Vec3::random_in_unit_sphere(),
+            r_in.time(),
+        );
 
         Some((Color::new(1.0, 1.0, 1.0), scattered))
     }
@@ -151,7 +159,11 @@ impl Scatter for Dielectric_Tint {
             unit_direction.refract(rec.normal, refraction_ratio)
         };
 
-        let scattered = Ray::new(rec.p, direction + self.fuzz * Vec3::random_in_unit_sphere(),r_in.time());
+        let scattered = Ray::new(
+            rec.p,
+            direction + self.fuzz * Vec3::random_in_hemisphere(rec.normal),
+            r_in.time(),
+        );
 
         Some((self.albedo, scattered))
     }
