@@ -6,12 +6,12 @@ use std::sync::Arc;
 
 pub struct Sphere {
     center: Point3,
-    radius: f64,
+    radius: f32,
     mat: Arc<dyn Scatter>,
 }
 
 impl Sphere {
-    pub fn new(cen: Point3, r: f64, m: Arc<dyn Scatter>) -> Sphere {
+    pub fn new(cen: Point3, r: f32, m: Arc<dyn Scatter>) -> Sphere {
         Sphere {
             center: cen,
             radius: r,
@@ -21,7 +21,7 @@ impl Sphere {
 }
 
 impl Hit for Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = r.direction().length_squared();
         let half_b = oc.dot(r.direction());
@@ -60,9 +60,9 @@ impl Hit for Sphere {
 pub struct MovingSphere {
     center0: Point3,
     center1: Point3,
-    time0: f64,
-    time1: f64,
-    radius: f64,
+    time0: f32,
+    time1: f32,
+    radius: f32,
     mat: Arc<dyn Scatter>,
 }
 
@@ -70,9 +70,9 @@ impl MovingSphere {
     pub fn new(
         cen0: Point3,
         cen1: Point3,
-        time0: f64,
-        time1: f64,
-        r: f64,
+        time0: f32,
+        time1: f32,
+        r: f32,
         m: Arc<dyn Scatter>,
     ) -> MovingSphere {
         MovingSphere {
@@ -84,14 +84,14 @@ impl MovingSphere {
             mat: m,
         }
     }
-    pub fn center(&self, time: f64) -> Point3 {
+    pub fn center(&self, time: f32) -> Point3 {
         self.center0
             + ((time - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
     }
 }
 
 impl Hit for MovingSphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center(r.time());
         let a = r.direction().length_squared();
         let half_b = oc.dot(r.direction());

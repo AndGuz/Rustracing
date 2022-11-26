@@ -5,14 +5,14 @@ pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub mat: std::sync::Arc<dyn Scatter>,
-    pub t: f64,
+    pub t: f32,
     pub front_face: bool,
 }
 
 pub type World = Vec<Box<dyn Hit>>;
 
 impl Hit for World {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut tmp_rec = None;
         let mut closest_so_far = t_max;
 
@@ -38,5 +38,5 @@ impl HitRecord {
 }
 
 pub trait Hit: Send + Sync {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
 }

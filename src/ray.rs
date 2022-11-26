@@ -3,11 +3,11 @@ use super::vec::{Point3, Vec3};
 pub struct Ray {
     orig: Point3,
     dir: Vec3,
-    tm: f64,
+    tm: f32,
 }
 
 impl Ray {
-    pub fn new(origin: Point3, direction: Vec3, time: f64) -> Ray {
+    pub fn new(origin: Point3, direction: Vec3, time: f32) -> Ray {
         Ray {
             orig: origin,
             dir: direction,
@@ -23,11 +23,11 @@ impl Ray {
         self.dir
     }
 
-    pub fn at(&self, t: f64) -> Point3 {
+    pub fn at(&self, t: f32) -> Point3 {
         self.orig + t * self.dir
     }
 
-    pub fn time(&self) -> f64 {
+    pub fn time(&self) -> f32 {
         self.tm
     }
 }

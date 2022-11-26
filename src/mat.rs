@@ -37,11 +37,11 @@ impl Scatter for Lambertian {
 #[derive(Clone, Copy)]
 pub struct Metal {
     albedo: Color,
-    fuzz: f64,
+    fuzz: f32,
 }
 
 impl Metal {
-    pub fn new(a: Color, f: f64) -> Metal {
+    pub fn new(a: Color, f: f32) -> Metal {
         Metal { albedo: a, fuzz: f }
     }
 }
@@ -65,19 +65,19 @@ impl Scatter for Metal {
 
 #[derive(Clone, Copy)]
 pub struct Dielectric {
-    ir: f64,
-    fuzz: f64,
+    ir: f32,
+    fuzz: f32,
 }
 
 impl Dielectric {
-    pub fn new(index_of_refraction: f64, fuzz: f64) -> Dielectric {
+    pub fn new(index_of_refraction: f32, fuzz: f32) -> Dielectric {
         Dielectric {
             ir: index_of_refraction,
             fuzz: fuzz,
         }
     }
 
-    fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    fn reflectance(cosine: f32, ref_idx: f32) -> f32 {
         let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
         r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
     }
@@ -97,7 +97,7 @@ impl Scatter for Dielectric {
 
         let mut rng = rand::thread_rng();
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        let will_reflect = rng.gen::<f64>() < Self::reflectance(cos_theta, refraction_ratio);
+        let will_reflect = rng.gen::<f32>() < Self::reflectance(cos_theta, refraction_ratio);
 
         let direction = if cannot_refract || will_reflect {
             unit_direction.reflect(rec.normal)
@@ -117,13 +117,13 @@ impl Scatter for Dielectric {
 
 #[derive(Clone, Copy)]
 pub struct Dielectric_Tint {
-    ir: f64,
-    fuzz: f64,
+    ir: f32,
+    fuzz: f32,
     albedo: Color,
 }
 
 impl Dielectric_Tint {
-    pub fn new(index_of_refraction: f64, fuzz: f64, albedo: Color) -> Dielectric_Tint {
+    pub fn new(index_of_refraction: f32, fuzz: f32, albedo: Color) -> Dielectric_Tint {
         Dielectric_Tint {
             ir: index_of_refraction,
             fuzz: fuzz,
@@ -131,7 +131,7 @@ impl Dielectric_Tint {
         }
     }
 
-    fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    fn reflectance(cosine: f32, ref_idx: f32) -> f32 {
         let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
         r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
     }
@@ -151,7 +151,7 @@ impl Scatter for Dielectric_Tint {
 
         let mut rng = rand::thread_rng();
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        let will_reflect = rng.gen::<f64>() < Self::reflectance(cos_theta, refraction_ratio);
+        let will_reflect = rng.gen::<f32>() < Self::reflectance(cos_theta, refraction_ratio);
 
         let direction = if cannot_refract || will_reflect {
             unit_direction.reflect(rec.normal)
