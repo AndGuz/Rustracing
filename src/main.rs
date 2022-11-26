@@ -98,7 +98,7 @@ fn front_spheres() -> World {
     world.push(Box::new(sphere3));
     world
 }
-fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
+fn ray_color(r: &Ray, world: &World, depth: u32) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
@@ -119,10 +119,10 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
 fn main() {
     //Imagen por si aca
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
-    const IMAGE_WIDTH: u64 = 500;
-    const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f32) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 50;
-    const MAX_DEPTH: u64 = 5;
+    const IMAGE_WIDTH: u32 = 500;
+    const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f32) / ASPECT_RATIO) as u32;
+    const SAMPLES_PER_PIXEL: u32 = 50;
+    const MAX_DEPTH: u32 = 5;
 
     let world = front_spheres();
     //Camara

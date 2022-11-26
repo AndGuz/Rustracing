@@ -121,19 +121,19 @@ impl Vec3 {
         *self / self.length()
     }
 
-    pub fn format_color(&self, samples_per_pixel: u64) -> String {
+    pub fn format_color(&self, samples_per_pixel: u32) -> String {
         let ir = (256.0
             * (self[0] / (samples_per_pixel as f32))
                 .sqrt()
-                .clamp(0.0, 0.999)) as u64;
+                .clamp(0.0, 0.999)) as u32;
         let ig = (256.0
             * (self[1] / (samples_per_pixel as f32))
                 .sqrt()
-                .clamp(0.0, 0.999)) as u64;
+                .clamp(0.0, 0.999)) as u32;
         let ib = (256.0
             * (self[2] / (samples_per_pixel as f32))
                 .sqrt()
-                .clamp(0.0, 0.999)) as u64;
+                .clamp(0.0, 0.999)) as u32;
 
         format!("{} {} {}", ir, ig, ib)
     }
