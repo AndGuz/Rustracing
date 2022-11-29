@@ -53,7 +53,7 @@ impl Hit for Sphere {
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
 
-        return Some(rec);
+        Some(rec)
     }
 }
 
@@ -78,8 +78,8 @@ impl MovingSphere {
         MovingSphere {
             center0: cen0,
             center1: cen1,
-            time0: time0,
-            time1: time1,
+            time0,
+            time1,
             radius: r,
             mat: m,
         }
@@ -123,6 +123,6 @@ impl Hit for MovingSphere {
         let outward_normal = (rec.p - self.center(r.time())) / self.radius;
         rec.set_face_normal(r, outward_normal);
 
-        return Some(rec);
+        Some(rec)
     }
 }

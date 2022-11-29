@@ -25,7 +25,7 @@ impl Vec3 {
             e: [
                 rng.gen_range(r.clone()),
                 rng.gen_range(r.clone()),
-                rng.gen_range(r.clone()),
+                rng.gen_range(r),
             ],
         }
     }
@@ -124,23 +124,26 @@ impl Vec3 {
     pub fn format_color(&self, samples_per_pixel: u32) -> String {
         let ir = (256.0
             * (self[0] / (samples_per_pixel as f32))
-                .powf(1.0/2.2)
+                .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
         let ig = (256.0
             * (self[1] / (samples_per_pixel as f32))
-                .powf(1.0/2.2)
+                .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
         let ib = (256.0
             * (self[2] / (samples_per_pixel as f32))
-                .powf(1.0/2.2)
+                .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
 
         format!("{} {} {}", ir, ig, ib)
     }
 
-    pub fn format_color_to_vec3(formatted_color : String) -> Vec3{
-        let rgb: Vec<f32> = formatted_color.split_whitespace().filter_map(|x| x.parse::<f32>().ok()).collect();
-        return Vec3::new(rgb[0], rgb[1], rgb[2]);
+    pub fn format_color_to_vec3(formatted_color: String) -> Vec3 {
+        let rgb: Vec<f32> = formatted_color
+            .split_whitespace()
+            .filter_map(|x| x.parse::<f32>().ok())
+            .collect();
+        Vec3::new(rgb[0], rgb[1], rgb[2])
     }
 }
 

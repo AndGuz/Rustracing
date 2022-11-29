@@ -1,6 +1,5 @@
 mod vec;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-use std::io::{stderr, Write};
 use std::sync::Arc;
 use vec::{Color, Vec3};
 mod hit;
@@ -67,7 +66,7 @@ fn random_scene() -> World {
     let mat1 = Arc::new(Dielectric::new(1.5, 0.0));
     let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    let mat4 = Arc::new(Dielectric_Tint::new(1.33, 0.1, Color::random(0.0..1.0)));
+    let mat4 = Arc::new(DielectricTint::new(1.33, 0.1, Color::random(0.0..1.0)));
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
     let sphere2 = Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, mat2);
@@ -83,7 +82,7 @@ fn random_scene() -> World {
 }
 
 fn front_spheres() -> World {
-    let mat1 = Arc::new(Dielectric_Tint::new(1.33, 0.2, Color::new(1.0, 0.5, 0.8)));
+    let mat1 = Arc::new(DielectricTint::new(1.33, 0.2, Color::new(1.0, 0.5, 0.8)));
     let sphere1 = Sphere::new(Point3::new(0.0, 0.0, -1.0), 1.0, mat1);
     let mat2 = Arc::new(Lambertian::new(Color::new(1.0, 0.5, 0.5)));
     let sphere2 = Sphere::new(Point3::new(-2.0, 0.0, -1.0), 1.0, mat2);
@@ -99,7 +98,7 @@ fn front_spheres() -> World {
     world
 }
 fn ray_color(r: &Ray, world: &World, depth: u32) -> Color {
-    if depth <= 0 {
+    if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
@@ -146,7 +145,6 @@ fn main() {
 
     //Salida de ppm
     println!("P3\n{} {}\n 256", IMAGE_WIDTH, IMAGE_HEIGHT);
-    let mut rng = rand::thread_rng();
 
     for j in (0..IMAGE_HEIGHT).rev() {
         //eprintln!("\r{} ", j + 1);

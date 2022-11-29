@@ -73,7 +73,7 @@ impl Dielectric {
     pub fn new(index_of_refraction: f32, fuzz: f32) -> Dielectric {
         Dielectric {
             ir: index_of_refraction,
-            fuzz: fuzz,
+            fuzz,
         }
     }
 
@@ -116,18 +116,18 @@ impl Scatter for Dielectric {
 }
 
 #[derive(Clone, Copy)]
-pub struct Dielectric_Tint {
+pub struct DielectricTint {
     ir: f32,
     fuzz: f32,
     albedo: Color,
 }
 
-impl Dielectric_Tint {
-    pub fn new(index_of_refraction: f32, fuzz: f32, albedo: Color) -> Dielectric_Tint {
-        Dielectric_Tint {
+impl DielectricTint {
+    pub fn new(index_of_refraction: f32, fuzz: f32, albedo: Color) -> DielectricTint {
+        DielectricTint {
             ir: index_of_refraction,
-            fuzz: fuzz,
-            albedo: albedo,
+            fuzz,
+            albedo,
         }
     }
 
@@ -137,7 +137,7 @@ impl Dielectric_Tint {
     }
 }
 
-impl Scatter for Dielectric_Tint {
+impl Scatter for DielectricTint {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let refraction_ratio = if rec.front_face {
             1.0 / self.ir
