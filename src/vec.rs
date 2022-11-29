@@ -7,6 +7,9 @@ use std::ops;
 pub struct Vec3 {
     e: [f32; 3],
 }
+pub fn map_range(num:f32,in_min:f32,in_max:f32,out_min:f32,out_max:f32) -> f32{
+    (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+}
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;
@@ -17,7 +20,7 @@ impl Vec3 {
     pub fn new(e0: f32, e1: f32, e2: f32) -> Self {
         Vec3 { e: [e0, e1, e2] }
     }
-
+    #[inline]
     pub fn random(r: ops::Range<f32>) -> Vec3 {
         let mut rng = rand::thread_rng();
 
@@ -29,7 +32,7 @@ impl Vec3 {
             ],
         }
     }
-
+    #[inline]
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let v = Vec3::random(-1.0..1.0);
@@ -74,39 +77,44 @@ impl Vec3 {
             }
         }
     }
-
+    #[inline]
     pub fn length(&self) -> f32 {
         self.length_squared().sqrt()
     }
-
+    #[inline]
     pub fn length_squared(&self) -> f32 {
         self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
-
+    #[inline]
     pub fn x(&self) -> f32 {
         self.e[0]
     }
+    #[inline]
     pub fn y(&self) -> f32 {
         self.e[1]
     }
+    #[inline]
     pub fn z(&self) -> f32 {
         self.e[2]
     }
-
+    #[inline]
     pub fn r(&self) -> f32 {
         self.e[0]
     }
+    #[inline]
     pub fn g(&self) -> f32 {
         self.e[1]
     }
+    #[inline]
     pub fn b(&self) -> f32 {
         self.e[2]
     }
-
+    #[inline]
     pub fn dot(&self, rhs: Vec3) -> f32 {
         self.x() * rhs.x() + self.y() * rhs.y() + self.z() * rhs.z()
     }
 
+    #[inline]
     pub fn cross(&self, rhs: Vec3) -> Vec3 {
         Vec3 {
             e: [
@@ -117,44 +125,57 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub fn unit_vector(&self) -> Vec3 {
         *self / self.length()
     }
 
     #[inline]
-    pub fn format_color(&self, samples_per_pixel: u32) -> String {
+    pub fn format_color(&self, samples_per_pixel: u32,in_min_max:(f32,f32)) -> String {
+        let (in_min,in_max) = in_min_max;
+        let irt = map_range(self[0] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
+        let igt = map_range(self[1] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
+        let ibt = map_range(self[2] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
+
         let ir = (256.0
-            * (self[0] / (samples_per_pixel as f32))
+            * (irt)
                 .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
         let ig = (256.0
-            * (self[1] / (samples_per_pixel as f32))
+            * (igt)
                 .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
         let ib = (256.0
-            * (self[2] / (samples_per_pixel as f32))
+            * (ibt)
                 .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
 
         format!("{} {} {}", ir, ig, ib)
     }
 
-    pub fn format_color_from_u8_u32(&self,samples_per_pixel: u32) -> u32{
-        let ir = (256.0
-            * (self[0] / (samples_per_pixel as f32))
+    #[inline]
+    pub fn format_color_to_array(&self,samples_per_pixel: u32, in_min_max:(f32,f32)) -> [u8;4]{
+        let (in_min,in_max) = in_min_max;
+        let irt = map_range(self[0] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
+        let igt = map_range(self[1] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
+        let ibt = map_range(self[2] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
+
+        let ir = (255.0
+            * (irt)
                 .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
-        let ig = (256.0
-            * (self[1] / (samples_per_pixel as f32))
+        let ig = (255.0
+            * (igt)
                 .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
-        let ib = (256.0
-            * (self[2] / (samples_per_pixel as f32))
+        let ib = (255.0
+            * (ibt)
                 .powf(1.0 / 2.2)
                 .clamp(0.0, 0.999)) as u32;
-        (ir << 16) | (ig << 8) | ib
+
+        [ir as u8,ig as u8,ib as u8,255]
     }
-    
+
     pub fn format_color_to_vec3(formatted_color: String) -> Vec3 {
         let rgb: Vec<f32> = formatted_color
             .split_whitespace()

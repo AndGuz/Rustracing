@@ -1,11 +1,12 @@
 mod vec;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-use std::sync::Arc;
+use std::{sync::Arc, cell::RefCell};
 use vec::{Color, Vec3};
 mod hit;
 mod ray;
 mod sphere;
 use ray::Ray;
+extern crate mini_gl_fb;
 mod camera;
 mod mat;
 use rand::{self, Rng};
@@ -87,7 +88,7 @@ fn front_spheres() -> World {
     let sphere1 = Sphere::new(Point3::new(0.0, 0.0, -1.0), 1.0, mat1);
     let mat2 = Arc::new(Lambertian::new(Color::new(1.0, 0.5, 0.5)));
     let sphere2 = Sphere::new(Point3::new(-2.0, 0.0, -1.0), 1.0, mat2);
-    let mat3 = Arc::new(Metal::new(Color::new(0.4, 0.8, 0.8), 0.2));
+    let mat3 = Arc::new(Metal::new(Color::new(0.4, 0.8, 0.8), 0.0));
     let sphere3 = Sphere::new(Point3::new(-3.0, 0.0, -1.0), 1.0, mat3);
     let ground_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     let ground_sphere = Sphere::new(Point3::new(0.0, -1002.0, 0.0), 1000.0, ground_mat);
@@ -118,13 +119,17 @@ fn ray_color(r: &Ray, world: &World, depth: u32) -> Color {
 
 fn main() {
     //Imagen por si aca
-    const ASPECT_RATIO: f32 = 16.0 / 9.0;
+    const ASPECT_RATIO: f32 = 4.0 / 3.0;
     const IMAGE_WIDTH: u32 = 500;
     const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f32) / ASPECT_RATIO) as u32;
     const SAMPLES_PER_PIXEL: u32 = 50;
     const MAX_DEPTH: u32 = 5;
+    const CHUNKS:u32 = 8;
 
-    let world = front_spheres();
+    let (mut event_loop, mut fb) = mini_gl_fb::gotta_go_fast("RTXBROS", IMAGE_WIDTH as f64, IMAGE_HEIGHT as f64);
+    let mut buffer = Arc::new(std::sync::Mutex::new(vec![[128u8,0,0,255];(IMAGE_WIDTH*IMAGE_HEIGHT) as usize]));
+
+    let world = random_scene();
     //Camara
     let lookfrom = Point3::new(13.0, 2.0, 3.0);
     let lookat = Point3::new(0.0, 0.0, 0.0);
@@ -147,6 +152,7 @@ fn main() {
 
     //Salida de ppm
     println!("P3\n{} {}\n 256", IMAGE_WIDTH, IMAGE_HEIGHT);
+    let mut refresh_count = 0;
 
     for j in (0..IMAGE_HEIGHT).rev() {
         //eprintln!("\r{} ", j + 1);
@@ -166,13 +172,23 @@ fn main() {
                     let r = cam.get_ray(u, v);
                     pixel_color += ray_color(&r, &world, MAX_DEPTH);
                 }
+                buffer.as_ref().lock().unwrap()[j as usize * IMAGE_WIDTH as usize + i as usize] = pixel_color.format_color_to_array(SAMPLES_PER_PIXEL, (0.0,1.0));
+                //buffer[j as usize * IMAGE_WIDTH as usize + i as usize] = pixel_color.format_color_to_array(SAMPLES_PER_PIXEL, (0.0,1.0));
                 pixel_color
             })
             .collect();
 
         for pixel_color in scanline {
-            println!("{}", pixel_color.format_color(SAMPLES_PER_PIXEL));
+            println!("{}", pixel_color.format_color(SAMPLES_PER_PIXEL,(0.0,1.0)));
+        }
+
+        refresh_count += 1;
+        if refresh_count > IMAGE_HEIGHT/CHUNKS{
+            refresh_count = 0;
+            fb.update_buffer(&buffer.try_lock().unwrap());
         }
     }
+    fb.update_buffer(&buffer.try_lock().unwrap());
+    fb.persist(&mut event_loop);
     eprintln!("\nTerminado cabros");
 }
