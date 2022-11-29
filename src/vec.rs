@@ -139,6 +139,22 @@ impl Vec3 {
         format!("{} {} {}", ir, ig, ib)
     }
 
+    pub fn format_color_from_u8_u32(&self,samples_per_pixel: u32) -> u32{
+        let ir = (256.0
+            * (self[0] / (samples_per_pixel as f32))
+                .powf(1.0 / 2.2)
+                .clamp(0.0, 0.999)) as u32;
+        let ig = (256.0
+            * (self[1] / (samples_per_pixel as f32))
+                .powf(1.0 / 2.2)
+                .clamp(0.0, 0.999)) as u32;
+        let ib = (256.0
+            * (self[2] / (samples_per_pixel as f32))
+                .powf(1.0 / 2.2)
+                .clamp(0.0, 0.999)) as u32;
+        (ir << 16) | (ig << 8) | ib
+    }
+    
     pub fn format_color_to_vec3(formatted_color: String) -> Vec3 {
         let rgb: Vec<f32> = formatted_color
             .split_whitespace()
