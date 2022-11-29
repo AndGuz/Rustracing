@@ -121,6 +121,7 @@ impl Vec3 {
         *self / self.length()
     }
 
+    #[inline]
     pub fn format_color(&self, samples_per_pixel: u32) -> String {
         let ir = (256.0
             * (self[0] / (samples_per_pixel as f32))
