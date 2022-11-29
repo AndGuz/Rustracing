@@ -10,6 +10,7 @@ mod camera;
 mod mat;
 use rand::{self, Rng};
 
+
 use crate::vec::Point3;
 use camera::Camera;
 use hit::{Hit, World};
@@ -130,6 +131,7 @@ fn main() {
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;
+
 
     let cam = Camera::new(
         lookfrom,
