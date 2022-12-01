@@ -12,6 +12,7 @@ pub struct HitRecord {
 pub type World = Vec<Box<dyn Hit>>;
 
 impl Hit for World {
+    #[inline]
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut tmp_rec = None;
         let mut closest_so_far = t_max;

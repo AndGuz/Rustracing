@@ -124,7 +124,7 @@ fn main() {
     const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f32) / ASPECT_RATIO) as u32;
     const SAMPLES_PER_PIXEL: u32 = 50;
     const MAX_DEPTH: u32 = 5;
-    const CHUNKS:u32 = 8;
+    const CHUNKS:u32 = 20;
 
     let (mut event_loop, mut fb) = mini_gl_fb::gotta_go_fast("RTXBROS", IMAGE_WIDTH as f64, IMAGE_HEIGHT as f64);
     let mut buffer = Arc::new(std::sync::Mutex::new(vec![[128u8,0,0,255];(IMAGE_WIDTH*IMAGE_HEIGHT) as usize]));
