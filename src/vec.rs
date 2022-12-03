@@ -20,7 +20,7 @@ impl Vec3 {
     pub fn new(e0: f32, e1: f32, e2: f32) -> Self {
         Vec3 { e: [e0, e1, e2] }
     }
-    #[inline]
+    
     pub fn random(r: ops::Range<f32>) -> Vec3 {
         let mut rng = rand::thread_rng();
 
@@ -32,7 +32,7 @@ impl Vec3 {
             ],
         }
     }
-    #[inline]
+    
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let v = Vec3::random(-1.0..1.0);
@@ -77,44 +77,44 @@ impl Vec3 {
             }
         }
     }
-    #[inline]
+    
     pub fn length(&self) -> f32 {
         self.length_squared().sqrt()
     }
-    #[inline]
+    
     pub fn length_squared(&self) -> f32 {
         self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
-    #[inline]
+    
     pub fn x(&self) -> f32 {
         self.e[0]
     }
-    #[inline]
+    
     pub fn y(&self) -> f32 {
         self.e[1]
     }
-    #[inline]
+    
     pub fn z(&self) -> f32 {
         self.e[2]
     }
-    #[inline]
+    
     pub fn r(&self) -> f32 {
         self.e[0]
     }
-    #[inline]
+    
     pub fn g(&self) -> f32 {
         self.e[1]
     }
-    #[inline]
+    
     pub fn b(&self) -> f32 {
         self.e[2]
     }
-    #[inline]
+    
     pub fn dot(&self, rhs: Vec3) -> f32 {
         self.x() * rhs.x() + self.y() * rhs.y() + self.z() * rhs.z()
     }
 
-    #[inline]
+    
     pub fn cross(&self, rhs: Vec3) -> Vec3 {
         Vec3 {
             e: [
@@ -125,12 +125,12 @@ impl Vec3 {
         }
     }
 
-    #[inline]
+    
     pub fn unit_vector(&self) -> Vec3 {
         *self / self.length()
     }
 
-    #[inline]
+    
     pub fn format_color(&self, samples_per_pixel: u32,in_min_max:(f32,f32)) -> String {
         let (in_min,in_max) = in_min_max;
         let irt = map_range(self[0] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);
@@ -153,7 +153,7 @@ impl Vec3 {
         format!("{} {} {}", ir, ig, ib)
     }
 
-    #[inline]
+    
     pub fn format_color_to_array(&self,samples_per_pixel: u32, in_min_max:(f32,f32)) -> [u8;4]{
         let (in_min,in_max) = in_min_max;
         let irt = map_range(self[0] / (samples_per_pixel as f32), in_min, in_max, 0.0, 1.0);

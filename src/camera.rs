@@ -50,7 +50,7 @@ impl Camera {
             time1,
         }
     }
-    #[inline]
+    
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
         let rd = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.cu * rd.x() + self.cv * rd.y();

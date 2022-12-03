@@ -14,7 +14,7 @@ use rand::{self, Rng};
 
 use crate::vec::Point3;
 use camera::Camera;
-use hit::{Hit, World};
+use hit::{Hit, World, HitRecord};
 use mat::*;
 use sphere::{MovingSphere, Sphere};
 

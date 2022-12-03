@@ -12,7 +12,7 @@ pub struct HitRecord {
 pub type World = Vec<Box<dyn Hit>>;
 
 impl Hit for World {
-    #[inline]
+    
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut tmp_rec = None;
         let mut closest_so_far = t_max;
@@ -28,7 +28,7 @@ impl Hit for World {
     }
 }
 impl HitRecord {
-    #[inline]
+    
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: Vec3) {
         self.front_face = r.direction().dot(outward_normal) < 0.0;
         self.normal = if self.front_face {
